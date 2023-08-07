@@ -40,6 +40,8 @@
   <build>
     <plugins>
 
+<!--       To double check push to right branch-->
+
       <!--force java 8-->
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>

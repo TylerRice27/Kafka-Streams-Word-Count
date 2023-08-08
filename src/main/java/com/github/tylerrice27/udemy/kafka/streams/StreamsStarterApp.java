@@ -19,7 +19,7 @@ public class StreamsStarterApp {
 
         Properties config = new Properties();
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "word-count");
-        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
 //        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -30,7 +30,7 @@ public class StreamsStarterApp {
 //        1 - Stream from Kafka
 
 //        NOTE with KStream the String on the left is my key and the String on the right is the value of the data
-        KStream<String, String> wordCountInput = builder.stream("word-count-input");
+        KStream<String, String> wordCountInput = builder.stream("new-word-count-input");
 
 //        2 - map values to lowercase
 
@@ -52,7 +52,7 @@ public class StreamsStarterApp {
 //        NOTE Kafka is a strongly typed library and you may get a lot of typecast errors if you don't specify the right types between Kafka and Streams
 //        wordCounts.to(Serdes.String(), Serdes.Long(), "word-count-output");
 
-        wordCounts.toStream().to("word-count-output", Produced.with(Serdes.String(), Serdes.Long()));
+        wordCounts.toStream().to("new-word-count-output", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();

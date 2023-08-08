@@ -55,6 +55,12 @@ public class StreamsStarterApp {
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
+//        Prints the Topology which gives me access to the stream information and operations
+        System.out.println(streams.toString());
+
+//        Shutdown hook to correctly close the streams application. This should be done in every application
+//        usually last line of code
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
 
 
 

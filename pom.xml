@@ -7,6 +7,7 @@
   <name>Archetype - Kafka-Streams-Word-Count</name>
   <url>http://maven.apache.org</url>
 
+
   <properties>
     <kotlin.version>1.9.0</kotlin.version>
   </properties>
@@ -72,6 +73,7 @@
             </goals>
           </execution>
           <execution>
+
             <id>test-compile</id>
             <phase>test-compile</phase>
             <goals>
@@ -81,6 +83,9 @@
         </executions>
         <configuration>
           <jvmTarget>1.8</jvmTarget>
+
+
+
         </configuration>
       </plugin>
       <plugin>
@@ -106,6 +111,7 @@
         <configuration>
         <source>1.8</source>
         <target>1.8</target>
+
       </configuration>
       </plugin>
 

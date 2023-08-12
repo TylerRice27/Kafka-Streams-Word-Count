@@ -23,20 +23,25 @@ public class FavoriteColorApp {
 
     StreamsBuilder builder = new StreamsBuilder();
 
-//    1- Read a KStream and extract the key
-KStream<String, String> favoriteColorInput = builder.stream("favorite-color-input");
+//    1- Read a KStream
+KStream<String, String> favoriteColorInput = builder.stream("color-input");
+//    2 - Filter Bad Values
+KStream<String, String> onlyColors = favoriteColorInput.filter((key, value) -> value == "")
+//    3 - SelectKey that will be the user Id
+        .selectKey((ignoredKey, newKey) -> newKey)
+//    4 - MapValues to extract the color (as lowercase)
+        .mapValues(onlyColor -> onlyColor.toLowerCase())
+//    5 - Filter to remove bad colors. NOTE come back to this need to filter more
+        .filter((key, value) -> value == "red")
+//    6 - Write to Kafka as intermediary topic
+    KStream<String>
+//    7 - Read from Kafka as a KTable (KTable)
 
-//    2 - Write to a Kafka topic. That topic should be a compacted topic
-    favoriteColorInput.toStream().to("compacted-color-topic";)
+//    8 - GroupBy colors
 
-//    3- The results can be read from the compacted Topic from Kafka as a KTable
-KTable<String,String> favoriteColorKTable = builder.table("compacted-color-topic")
-//    4 - From a KTable perform aggregation on the KTable (groupBy then count)
-        .groupByKey()
-        .count();
-//    5 - write the results back to Kafka
-favoriteColorKTable.toStream().to("final-color-topic");
-    KTable<String, String> updatedColor = favoriteColorInput.flatMapValues()
+//    9 - Count to count colors occurrences (KTable)
+
+//    10 - Write to Kafka as final topic
 
 
 }

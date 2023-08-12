@@ -6,6 +6,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Properties;
 
@@ -22,15 +23,20 @@ public class FavoriteColorApp {
 
     StreamsBuilder builder = new StreamsBuilder();
 
-//    1- Stream to Kafka
+//    1- Read a KStream and extract the key
+KStream<String, String> favoriteColorInput = builder.stream("favorite-color-input");
 
-    KStream<String, String> favoriteColorInput = builder.stream("favorite-color-input");
-//KTable<String, String> updatedColor = favoriteColorInput.flatMapValues();
+//    2 - Write to a Kafka topic. That topic should be a compacted topic
+    favoriteColorInput.toStream().to("compacted-color-topic";)
 
-    //    Turn into a KTable at some point to only have updated values
-
-
-//    2- group by
+//    3- The results can be read from the compacted Topic from Kafka as a KTable
+KTable<String,String> favoriteColorKTable = builder.table("compacted-color-topic")
+//    4 - From a KTable perform aggregation on the KTable (groupBy then count)
+        .groupByKey()
+        .count();
+//    5 - write the results back to Kafka
+favoriteColorKTable.toStream().to("final-color-topic");
+    KTable<String, String> updatedColor = favoriteColorInput.flatMapValues()
 
 
 }

@@ -32,16 +32,17 @@ KStream<String, String> onlyColors = favoriteColorInput.filter((key, value) -> v
 //    4 - MapValues to extract the color (as lowercase)
         .mapValues(onlyColor -> onlyColor.toLowerCase())
 //    5 - Filter to remove bad colors. NOTE come back to this need to filter more
-        .filter((key, value) -> value == "red")
+        .filter((key, value) -> value == "red");
 //    6 - Write to Kafka as intermediary topic
-    KStream<String>
+    onlyColors.stream.to("middle-topic");
 //    7 - Read from Kafka as a KTable (KTable)
 
+KTable<String, String> compactedColors = builder.table("middle-topic")
 //    8 - GroupBy colors
-
+        .groupBy(key,value)
 //    9 - Count to count colors occurrences (KTable)
-
+        .count()
 //    10 - Write to Kafka as final topic
-
+        table.to("color-output")
 
 }

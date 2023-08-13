@@ -58,6 +58,8 @@ public class FavoriteColorApp {
 
 //        Take the builder and the config and start the stream
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
+//       Only do this in Dev - not in prod. Cleans up your slate.
+        streams.cleanUp();
         streams.start();
 
 //        Print out the topology info

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.rocksdb.Transaction;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -57,7 +58,8 @@ public class BankProducer {
         producer.close();
     }
 
-        private static ProducerRecord<String,String> randomTransaction(String name){
+
+        public static ProducerRecord<String,String> randomTransaction(String name){
 //            Creates an empty JSON {} because of the dependancy library I brought in
             ObjectNode transaction = JsonNodeFactory.instance.objectNode();
 //            This creates a random transaction 0 to 100

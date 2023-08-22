@@ -30,7 +30,7 @@ public class BankProducer {
         for (int i = 0; i < 100 ; i++) {
             String topic = "BankTopic";
             String key = "Tyler";
-            double value = Math.random();
+            double value = Math.round(Math.random()*700);
 
             ProducerRecord<String, Double> moneyMessage = new ProducerRecord<>(topic, key, value);
 

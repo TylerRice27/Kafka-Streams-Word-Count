@@ -19,14 +19,14 @@ public class BankProducer {
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.Serializer");
         config.put(ProducerConfig.ACKS_CONFIG, 1);
 
-        KafkaProducer<String,Integer> producer = new KafkaProducer<>(config);
+        KafkaProducer<String,Double> producer = new KafkaProducer<>(config);
 
         String topic = "BankTopic";
         String key = "Name";
-        Integer value = 0;
+        double value = Math.random();
 
+        ProducerRecord<String, Double> moneyMessage = new ProducerRecord<>(topic, key, value);
 
-        ProducerRecord<String, Integer> moneyMessage = new ProducerRecord<>(topic, key, value);
 
 
         producer.send(moneyMessage, new Callback(){

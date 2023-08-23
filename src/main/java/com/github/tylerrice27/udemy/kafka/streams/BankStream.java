@@ -31,8 +31,8 @@ public class BankStream {
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG,"127.0.0.1:9092");
 //       REMEMBER to add Exactly Once config
         config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
-        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerializer.class);
+//        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+//        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerializer.class);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
 //        Create your own Serializer and Deserializer for a JSON because it doesn't come prepackaged
@@ -64,7 +64,7 @@ public class BankStream {
 
         final Serializer<JsonNode> jsonSerializer = new JsonSerializer();
         final Deserializer<JsonNode> jsonDeserializer = new JsonDeserializer();
-        Serde<JsonNode> jsonSerde = Serdes.serdeFrom(jsonSerializer, jsonDeserializer);
+        Serde<JsonNode> jsonSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
 
 
         StreamsBuilder builder = new StreamsBuilder();
@@ -86,14 +86,14 @@ public class BankStream {
                 () -> startingBalance,
 //                TO DO COME back here and try to figure out this line
 //                My types do not match up correctly and also I think balance is missing completely
-                (key, transaction, balance) -> newBalance(transaction, (JsonNode) balance)
+                (key, transaction, balance) -> newBalance(transaction, balance)
 //                jsonSerde,
 //                "bank-balance-agg"
         );
 //                .count(Named.as("Total"));
 //    4. Send To in order to write the data back to Kafka
 
-        bankAmount.toStream().to("bank-output");
+        bankAmount.toStream().to("bank-output", Produced.with(Serdes.String(), jsonSerde));
 
         KafkaStreams streams = new KafkaStreams(builder.build(),config);
         streams.cleanUp();

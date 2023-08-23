@@ -72,7 +72,7 @@ public class BankProducer {
             transaction.put("amount", amount);
             transaction.put("time", now.toString());
 //           Return the message to the topic, key, transaction == value which is a JSON then toString()
-            return new ProducerRecord<>("TestBankTopic", name, transaction.toString());
+            return new ProducerRecord<>("bank-input", name, transaction.toString());
         }
 
     }

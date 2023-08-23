@@ -1,10 +1,8 @@
 package com.github.tylerrice27.udemy.kafka.streams;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -16,10 +14,9 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
-import org.apache.kafka.common.serialization.Deserializer;
+
 
 import java.time.Instant;
 import java.util.Properties;
@@ -33,7 +30,7 @@ public class BankStream {
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "bank-balance");
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG,"127.0.0.1:9092");
 //       REMEMBER to add Exactly Once config
-        config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE);
+        config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonSerializer.class);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -67,34 +64,36 @@ public class BankStream {
 
         final Serializer<JsonNode> jsonSerializer = new JsonSerializer();
         final Deserializer<JsonNode> jsonDeserializer = new JsonDeserializer();
-        Serde<JsonNode> jsonSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
+        Serde<JsonNode> jsonSerde = Serdes.serdeFrom(jsonSerializer, jsonDeserializer);
 
 
         StreamsBuilder builder = new StreamsBuilder();
 
 //    1. Read from one topic in Kafka
-        KStream<String, String> newBankTransaction = builder.stream("bank-input");
+        KStream<String, JsonNode> newBankTransaction = builder.stream("bank-input");
 
+//        Create the initial JSON object for balance
         ObjectNode startingBalance = JsonNodeFactory.instance.objectNode();
         startingBalance.put("count", 0);
         startingBalance.put("balance", 0);
         startingBalance.put("time", Instant.ofEpochMilli(0L).toString());
 
 //    2. GroupByKey, because your topic already has the right key, Which is the person name
-        KTable<String, JsonNode> bankAmount = newBankTransaction.groupByKey()
+        KTable<String, JsonNode> bankAmount = newBankTransaction
+                .groupByKey()
 //    3. Aggregate, to compute the bank balance
         .aggregate(
                 () -> startingBalance,
 //                TO DO COME back here and try to figure out this line
 //                My types do not match up correctly and also I think balance is missing completely
-                (key, transaction, balance) -> newBalance(transaction, balance),
-                jsonSerde,
-                "bank-balance-agg"
+                (key, transaction, balance) -> newBalance(transaction, (JsonNode) balance)
+//                jsonSerde,
+//                "bank-balance-agg"
         );
 //                .count(Named.as("Total"));
 //    4. Send To in order to write the data back to Kafka
 
-        bankAmount.toStream().to("final-balance");
+        bankAmount.toStream().to("bank-output");
 
         KafkaStreams streams = new KafkaStreams(builder.build(),config);
         streams.cleanUp();

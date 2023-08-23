@@ -29,6 +29,14 @@
       <version>3.5.1</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.kafka/connect-api -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>connect-api</artifactId>
+      <version>3.5.1</version>
+    </dependency>
+
+
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>

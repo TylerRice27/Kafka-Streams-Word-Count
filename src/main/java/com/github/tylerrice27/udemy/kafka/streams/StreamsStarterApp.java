@@ -36,7 +36,7 @@ public class StreamsStarterApp {
 
         KTable<String, Long> wordCounts = wordCountInput.mapValues(streamWords -> streamWords.toLowerCase())
 
-//        NOTE on the line about I did not end it with a ; instead I am able to chain the function with .Operation
+//        NOTE on the line above I did not end it with a ; instead I am able to chain the function with .Operation
 //        3 - flatmap values split by space
 //        NOTE this line allows you take the steam of messages and split on the space and put them in array of multiple messages.
                 .flatMapValues(lowerCaseStreamWords -> Arrays.asList(lowerCaseStreamWords.split(" ")))

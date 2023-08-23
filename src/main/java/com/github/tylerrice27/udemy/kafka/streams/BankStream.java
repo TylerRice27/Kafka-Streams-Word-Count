@@ -27,15 +27,15 @@ public class BankStream {
 //        A better name for Application Id could have bank-balance-application
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "bank-balance");,
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG,"127.0.0.1:9092");
-//       REMEBER to add Exactly Once config
+//       REMEMBER to add Exactly Once config
         config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, "io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-//        Create your own Serializer and Deserialzier for a JSON because it doesn't come prepackaged
+//        Create your own Serializer and Deserializer for a JSON because it doesn't come prepackaged
 //        This might be deprecated!!!!!!!!
-//        final Serializer<JsonNode> jsonSerialzier = new Serializer()
+//        final Serializer<JsonNode> jsonSerializer = new Serializer()
 //        final Deserializer<JsonNode> jsonDeserializer = new Deserializer();
 //        final Serde<JsonNode> jsonSerde = Serdes.serdeFrom(jsonSerialzier, jsonDeserializer);
 

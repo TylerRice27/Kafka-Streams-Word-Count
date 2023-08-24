@@ -35,10 +35,6 @@ public class BankProducer {
         KafkaProducer<String, String> producer = new KafkaProducer<>(config);
 
 
-//            String topic = "BankTopic";
-//            String key = "Tyler";
-//            double value = Math.round(Math.random()*700);
-
 //        My main loop that produces the message
         int i = 0;
         while (true) {

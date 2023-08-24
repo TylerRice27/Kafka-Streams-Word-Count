@@ -32,6 +32,7 @@ public class UserDataProducer {
         producer.send(userRecord("john", "First=John,Last=Doe,Email=john.doe@gmail.com")).get();
         producer.send(purchaseRecord("john", "Apples and Bananas (1)")).get();
 
+//      1 - Data goes to both Inner Join and Left Join
 
         Thread.sleep(10000);
 
@@ -39,12 +40,16 @@ public class UserDataProducer {
         System.out.println("\nExample 2 - non existing user\n");
         producer.send(purchaseRecord("bob", "Kafka Udemy Course (2)")).get();
 
+//        2- Data only goes to Left Join because there is no userInfo
+
         Thread.sleep(10000);
 
         // 3 - we update user "john", and send a new transaction
         System.out.println("\nExample 3 - update to user\n");
         producer.send(userRecord("john", "First=Johnny,Last=Doe,Email=johnny.doe@gmail.com")).get();
         producer.send(purchaseRecord("john", "Oranges (3)")).get();
+
+//        3- Data goes to both Inner Join and Left Join With updated Name
 
         Thread.sleep(10000);
 
@@ -55,6 +60,9 @@ public class UserDataProducer {
         producer.send(purchaseRecord("stephane", "Books (4)")).get();
         producer.send(userRecord("stephane", null)).get(); // delete for cleanup
 
+//        4 - The First purchase of Computer will go to Left Join because there is no data
+//        4 - The Second purchase of Books will go to both Inner Join and Left Join because the purhcase now belongs to a user
+
         Thread.sleep(10000);
 
         // 5 - we create a user, but it gets deleted before any purchase comes through
@@ -62,6 +70,9 @@ public class UserDataProducer {
         producer.send(userRecord("alice", "First=Alice")).get();
         producer.send(userRecord("alice", null)).get(); // that's the delete record
         producer.send(purchaseRecord("alice", "Apache Kafka Series (5)")).get();
+
+//        5 - Only shows up has a Left Join for purchases because even though she was a customer/user
+//        her user Profile is deleted before the purchase so it only shows up on the purchase log
 
         Thread.sleep(10000);
 

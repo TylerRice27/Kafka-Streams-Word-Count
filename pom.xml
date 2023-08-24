@@ -21,6 +21,14 @@
      <version>2.15.2</version>
     </dependency>
 
+<!--    Dependency needed for testing-->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-streams-test-utils</artifactId>
+      <version>3.5.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <!--MAVEN Version Kafka Streams-->
     <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams -->
     <dependency>

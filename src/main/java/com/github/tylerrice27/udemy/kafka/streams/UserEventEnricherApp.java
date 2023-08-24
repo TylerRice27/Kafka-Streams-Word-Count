@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.GlobalKTable;
+import org.apache.kafka.streams.kstream.KStream;
 
 import java.util.Properties;
 
@@ -20,6 +21,27 @@ public class UserEventEnricherApp {
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         StreamsBuilder builder = new StreamsBuilder();
+
+//        Get a global table out of Kafka. This table will be replicated on each Kafka Streams application
+//        the key of our GlobalKTable is the userID
+//        NOTE you can use the builder variable up above multiple times
+//        GlobalTable of user data
+        GlobalKTable<String, String> usersGlobalTable = builder.globalTable("user-table");
+
+//        purchase Stream
+        KStream<String, String> userPurchases = builder.stream("user-purchases");
+
+//        Enrich the Stream. Which our output of a KStream to GlobalKTable is KStream
+        KStream<String,String> userPurchasesEnrichedJoin =
+                userPurchases.join(usersGlobalTable,  // We want to join the user Purchaes with GlobalTable info
+//                        This map is standard for joins. Depending on what you are trying to join
+                        (key, value) -> key,   // This line is doing a map (key, value) from the UserPurchase stream then joins on the key from the GlobalKTable that match
+//                        Value of the stream and the value of the Table that is renamed to userPurchase and userInfo
+                        (userPurchase, userInfo) -> "Purchase=" + userPurchase + ",UserInfo=[" + userInfo + "]"
+                );
+
+        userPurchasesEnrichedJoin.to("user-purchases-enriched-inner-join");
+
 
 
 

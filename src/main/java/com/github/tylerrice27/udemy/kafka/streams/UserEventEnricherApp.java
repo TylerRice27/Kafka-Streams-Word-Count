@@ -3,6 +3,7 @@ package com.github.tylerrice27.udemy.kafka.streams;
 import jdk.nashorn.internal.objects.Global;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.GlobalKTable;
@@ -55,6 +56,15 @@ public class UserEventEnricherApp {
                             }
                         });
         userPurchasesEnrichedLeftJoin.to("user-purchases-enriched-left-join");
+
+        KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        streams.cleanUp();
+        streams.start();
+
+//        Print Topology
+        System.out.println(streams.toString());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
 
 
     }

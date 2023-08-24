@@ -42,8 +42,19 @@ public class UserEventEnricherApp {
 
         userPurchasesEnrichedJoin.to("user-purchases-enriched-inner-join");
 
-
-
+        KStream<String, String> userPurchasesEnrichedLeftJoin =
+                userPurchases.leftJoin(usersGlobalTable,
+                        (key, value) -> key,
+                        (userPurchase, userInfo) -> {
+//                    Because I am doing a left join and getting back all the purchases if it does not have
+//                     a user asscociated to that purchase I need to account for that
+                            if (userInfo != null) {
+                                return "Purchase=" + userPurchase + ",UserInfo=[" + userInfo + "]";
+                            } else {
+                                return "Purchase=" + userPurchase + ",UserInfo=null";
+                            }
+                        });
+        userPurchasesEnrichedLeftJoin.to("user-purchases-enriched-left-join");
 
 
     }

@@ -2,11 +2,9 @@ package com.github.tylerrice27.udemy.kafka.streams;
 
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.LongSerializer;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.serialization.*;
 import org.apache.kafka.streams.*;
-import org.apache.kafka.streams.test.TestRecord;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +19,8 @@ public class WordCountAppTest {
     StringSerializer stringSerializer = new StringSerializer();
 
     TestInputTopic<String, String> inputTopic = testDriver.createInputTopic("word-count-input", stringSerializer, stringSerializer);
+
+    TestOutputTopic<String, Long> outputTopic = testDriver.createOutputTopic("word-count-output", new StringDeserializer(), new LongDeserializer());
 
 //    TestRecord<String,Long> recordFactory = new TestRecord<>(new StringSerializer(), new LongSerializer());
 
@@ -39,6 +39,7 @@ public class WordCountAppTest {
         testDriver = new TopologyTestDriver(topology, config);
     }
 
+//    Always close your testDriver in a After block or your test will if you run second time because they won't be cleaned up
     @After
     public void closeTestDriver(){
         testDriver.close();
@@ -59,11 +60,33 @@ public class WordCountAppTest {
     public void makeSureCountsAreCorrect(){
     String firstExample = "testing Kafka Streams";
     pushNewInputRecord(firstExample);
+    TestOutputTopic<String, Long> firstOutput = readOutput();
+// TO DO come back to this OutputVerifier wont import so it might be something different to test now but cant find alternative
+   OutputVerifier.compareKeyValue(readOutput(), "testing", 1L);
+   OutputVerifier.compareKeyValue(readOutput(), "kafka", 1L);
+   OutputVerifier.compareKeyValue(readOutput(), "streams", 1L);
+
+   String secondExample = "testing Kafka again";
+   pushNewInputRecord(secondExample);
+   OutputVerifier.compareKeyValue(readOutput(), "testing", 2L);
+   OutputVerifier.compareKeyValue(readOutput(), "kafka", 2L);
+   OutputVerifier.compareKeyValue(readOutput(), "again", 1L);
+
     }
 
     @Test
-    public ProducerRecord<String,Long> readOutput(){
-       return  TestOutputTopic<String, Long> outputTopic = testDriver.createOutputTopic("word-count-output", stringSerde.deserializer(), longSerde.deserializer();
+    public void makeSureWordsBecomeLowercase(){
+        String upperCaseString = "KAFKA kafka Kafka";
+        pushNewInputRecord(upperCaseString);
+        OutputVerifier.compareKeyValue(readOutput(), "kafka", 1L);
+        OutputVerifier.compareKeyValue(readOutput(), "kafka", 2L);
+        OutputVerifier.compareKeyValue(readOutput(), "kafka", 3L);
+
+    }
+
+    @Test
+    public TestOutputTopic<String,Long> readOutput(){
+     return testDriver.createOutputTopic("word-count-output", new StringDeserializer(), new LongDeserializer());
 
     }
 
